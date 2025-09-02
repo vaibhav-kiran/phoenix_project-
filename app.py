@@ -103,7 +103,7 @@ for i in range(28):  # 7 days * 4 entries per day
 		"Date": time_point.strftime("%m/%d"),
 		"Time": time_point.strftime("%H:%M"),
 		"Weight (kg)": f"{weight:.2f}"
-	}
+	})
 # ---------- Baby Weight Tracking Section ----------
 st.markdown("### 📊 Baby Weight Tracking")
 
