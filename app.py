@@ -88,78 +88,155 @@ st.divider()
 # ---------- Baby Weight Overview ----------
 # ---------- Global Variables and Data Generation ----------
 # Generate weight data for the last 7 days (4 entries per day)
-weight_data = []
-from datetime import timedelta
-now = datetime.now()
+# weight_data = []
+# from datetime import timedelta
+# now = datetime.now()
 
-# Default current weight
-default_weight = 3.2
+# # Default current weight
+# default_weight = 3.2
 
-for i in range(28):  # 7 days * 4 entries per day
-	time_point = now - timedelta(hours=i * 6)
-	# Simulate weight variation (slight increase over time)
-	weight = default_weight + (i * 0.01) + np.random.normal(0, 0.05)
-	weight_data.append({
-		"Date": time_point.strftime("%m/%d"),
-		"Time": time_point.strftime("%H:%M"),
-		"Weight (kg)": f"{weight:.2f}"
-	})
+# for i in range(28):  # 7 days * 4 entries per day
+# 	time_point = now - timedelta(hours=i * 6)
+# 	# Simulate weight variation (slight increase over time)
+# 	weight = default_weight + (i * 0.01) + np.random.normal(0, 0.05)
+# 	weight_data.append({
+# 		"Date": time_point.strftime("%m/%d"),
+# 		"Time": time_point.strftime("%H:%M"),
+# 		"Weight (kg)": f"{weight:.2f}"
+# 	})
+# # ---------- Baby Weight Tracking Section ----------
+# st.markdown("### 📊 Baby Weight Tracking")
+
+# # Create two columns for the weight tracking interface
+# weight_track_col1, weight_track_col2 = st.columns([1, 2])
+
+# with weight_track_col1:
+# 	st.subheader("Weight Input")
+	
+# 	# Current weight display
+# 	current_weight = st.number_input(
+# 		"Current Weight (kg)", 
+# 		min_value=0.5, 
+# 		max_value=20.0, 
+# 		value=default_weight, 
+# 		step=0.1,
+# 		help="Enter the baby's current weight"
+# 	)
+	
+# 	# Add new weight entry button
+# 	if st.button("📝 Add New Weight Entry", use_container_width=True):
+# 		st.success(f"Weight {current_weight} kg recorded at {datetime.now().strftime('%H:%M')}")
+	
+# 	st.divider()
+	
+# 	# Weight summary metrics
+# 	st.metric(
+# 		label="Latest Weight", 
+# 		value=f"{current_weight} kg",
+# 		delta="+0.05 kg" if current_weight > default_weight else "-0.02 kg"
+# 	)
+	
+# 	weight_trend = "↗️ Gaining" if current_weight > default_weight else "↘️ losing"
+# 	st.metric(
+# 		label="Weight Trend", 
+# 		value=weight_trend
+# 	)
+
+# with weight_track_col2:
+# 	st.subheader("Weight History")
+	
+# 	# Display weight history table
+# 	weight_df = pd.DataFrame(weight_data)
+# 	st.dataframe(
+# 		weight_df, 
+# 		use_container_width=True, 
+# 		hide_index=True,
+# 		height=400
+# 	)
+	
+# 	st.caption("Weight records are automatically generated every 6 hours for the last 7 days")
+
+# st.divider()
+
+
+
+# ---------- Initialize Session State ----------
+if "weight_data" not in st.session_state:
+	st.session_state.weight_data = []
+	now = datetime.now()
+	default_weight = 3.2
+
+	# Pre-fill with last 7 days simulated data (6-hour intervals)
+	for i in range(28):
+		time_point = now - timedelta(hours=i * 6)
+		weight = default_weight + (i * 0.01) + np.random.normal(0, 0.05)
+		st.session_state.weight_data.append({
+			"Date": time_point.strftime("%m/%d"),
+			"Time": time_point.strftime("%H:%M"),
+			"Weight (kg)": round(weight, 2),
+			"Source": "Auto"
+		})
+
 # ---------- Baby Weight Tracking Section ----------
 st.markdown("### 📊 Baby Weight Tracking")
 
-# Create two columns for the weight tracking interface
 weight_track_col1, weight_track_col2 = st.columns([1, 2])
 
 with weight_track_col1:
 	st.subheader("Weight Input")
-	
-	# Current weight display
+
+	# Current weight input
 	current_weight = st.number_input(
 		"Current Weight (kg)", 
 		min_value=0.5, 
 		max_value=20.0, 
-		value=default_weight, 
+		value=3.2, 
 		step=0.1,
 		help="Enter the baby's current weight"
 	)
-	
-	# Add new weight entry button
+
+	# Add new entry
 	if st.button("📝 Add New Weight Entry", use_container_width=True):
-		st.success(f"Weight {current_weight} kg recorded at {datetime.now().strftime('%H:%M')}")
-	
+		st.session_state.weight_data.insert(0, {  # insert at top
+			"Date": datetime.now().strftime("%m/%d"),
+			"Time": datetime.now().strftime("%H:%M"),
+			"Weight (kg)": round(current_weight, 2),
+			"Source": "Manual"
+		})
+		st.success(f"Weight {current_weight:.2f} kg recorded at {datetime.now().strftime('%H:%M')}")
+
 	st.divider()
-	
+
 	# Weight summary metrics
-	st.metric(
-		label="Latest Weight", 
-		value=f"{current_weight} kg",
-		delta="+0.05 kg" if current_weight > default_weight else "-0.02 kg"
-	)
-	
-	weight_trend = "↗️ Gaining" if current_weight > default_weight else "↘️ losing"
-	st.metric(
-		label="Weight Trend", 
-		value=weight_trend
-	)
+	if st.session_state.weight_data:
+		latest_weight = st.session_state.weight_data[0]["Weight (kg)"]
+		prev_weight = st.session_state.weight_data[1]["Weight (kg)"] if len(st.session_state.weight_data) > 1 else latest_weight
+		delta = latest_weight - prev_weight
+
+		st.metric(
+			label="Latest Weight", 
+			value=f"{latest_weight} kg",
+			delta=f"{delta:+.2f} kg"
+		)
+
+		weight_trend = "↗️ Gaining" if delta > 0 else ("↘️ Losing" if delta < 0 else "➡️ Stable")
+		st.metric(label="Weight Trend", value=weight_trend)
 
 with weight_track_col2:
 	st.subheader("Weight History")
-	
-	# Display weight history table
-	weight_df = pd.DataFrame(weight_data)
+
+	weight_df = pd.DataFrame(st.session_state.weight_data)
 	st.dataframe(
 		weight_df, 
 		use_container_width=True, 
 		hide_index=True,
 		height=400
 	)
-	
-	st.caption("Weight records are automatically generated every 6 hours for the last 7 days")
+
+	st.caption("Records include both auto-generated (6-hour intervals) and manually entered weights.")
 
 st.divider()
 
-
-st.divider()
 
 # ---------- Interactive Baby Avatar ----------
 st.markdown("### 🎨 Interactive Baby Avatar")
