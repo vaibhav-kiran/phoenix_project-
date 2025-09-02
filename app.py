@@ -86,44 +86,80 @@ with alert_col2:
 st.divider()
 
 # ---------- Baby Weight Overview ----------
-st.markdown("### ⚖️ Baby Weight Overview")
+# ---------- Global Variables and Data Generation ----------
+# Generate weight data for the last 7 days (4 entries per day)
+weight_data = []
+from datetime import timedelta
+now = datetime.now()
 
-weight_overview_col1, weight_overview_col2, weight_overview_col3 = st.columns([1, 1, 2])
+# Default current weight
+default_weight = 3.2
 
-with weight_overview_col1:
-	st.metric(
-		label="Current Weight", 
-		value=f"{current_weight} kg",
-		delta="+0.05 kg" if current_weight > 3.15 else "-0.02 kg"
-	)
+for i in range(28):  # 7 days * 4 entries per day
+	time_point = now - timedelta(hours=i * 6)
+	# Simulate weight variation (slight increase over time)
+	weight = default_weight + (i * 0.01) + np.random.normal(0, 0.05)
+	weight_data.append({
+		"Date": time_point.strftime("%m/%d"),
+		"Time": time_point.strftime("%H:%M"),
+		"Weight (kg)": f"{weight:.2f}"
+	})
 
-with weight_overview_col2:
-	# Calculate weight trend
-	weight_trend = "↗️ Gaining" if current_weight > 3.15 else "↘️ Stable"
-	st.metric(
-		label="Weight Trend", 
-		value=weight_trend
-	)
+# Reverse to show most recent first
+weight_data.reverse()
 
-with weight_overview_col3:
-	# Weight chart for the last 7 days
-	weight_chart_data = pd.DataFrame(weight_data[:28])  # Last 28 entries (7 days)
-	weight_chart_data['Weight (kg)'] = weight_chart_data['Weight (kg)'].astype(float)
+# ---------- Sidebar Controls (Global) ----------
+with st.sidebar:
+	st.title("👶 Baby Comfort Monitor")
+	st.caption("Demo dashboard with dummy data")
+	st.divider()
+	st.subheader("Settings")
+	refresh_rate = st.slider("Auto-refresh (sec)", 0, 30, 0, help="Set to >0 for auto-refresh")
+	if refresh_rate:
+		st.caption(f"Auto-refreshing every {refresh_rate}s")
+		st.experimental_rerun
 	
-	weight_chart = (
-		alt.Chart(weight_chart_data)
-		.mark_line(point=True, color='#FF6B6B')
-		.encode(
-			x=alt.X('Date:N', title='Date'),
-			y=alt.Y('Weight (kg):Q', title='Weight (kg)'),
-			tooltip=['Date', 'Time', 'Weight (kg)']
-		)
-		.properties(height=150, title='Weight Trend (Last 7 Days)')
+	st.divider()
+	
+	# ---------- Baby Weight Tracking ----------
+	st.subheader("📊 Baby Weight Tracking")
+	
+	# Current weight display
+	current_weight = st.number_input(
+		"Current Weight (kg)", 
+		min_value=0.5, 
+		max_value=20.0, 
+		value=default_weight, 
+		step=0.1,
+		help="Enter the baby's current weight"
 	)
-	st.altair_chart(weight_chart, use_container_width=True)
+	
+	# Weight history table (every 6 hours)
+	st.write("**Weight History (6-hour intervals):**")
+	
+	# Display weight history in sidebar
+	weight_df = pd.DataFrame(weight_data)
+	st.dataframe(
+		weight_df, 
+		use_container_width=True, 
+		hide_index=True,
+		height=300
+	)
+	
+	# Add new weight entry button
+	if st.button("📝 Add New Weight Entry", use_container_width=True):
+		st.success(f"Weight {current_weight} kg recorded at {datetime.now().strftime('%H:%M')}")
+
+
+# Helper to draw a small status badge
+def status_badge(label: str, emoji: str, color: str) -> None:
+	st.markdown(
+		f"<span style='display:inline-block;padding:4px 8px;border-radius:8px;background:{color};color:#111;font-weight:600'>"
+		f"{emoji} {label}</span>",
+		unsafe_allow_html=True,
+	)
 
 st.divider()
-
 
 # ---------- Interactive Baby Avatar ----------
 st.markdown("### 🎨 Interactive Baby Avatar")
