@@ -18,13 +18,8 @@ st.set_page_config(
 # ---------- Sidebar Controls (Global) ----------
 with st.sidebar:
 	st.title("👶 Baby Comfort Monitor")
-	st.caption("Demo dashboard with dummy data")
-	st.divider()
-	st.subheader("Settings")
-	refresh_rate = st.slider("Auto-refresh (sec)", 0, 30, 0, help="Set to >0 for auto-refresh")
-	if refresh_rate:
-		st.caption(f"Auto-refreshing every {refresh_rate}s")
-		st.experimental_rerun
+	st.caption("Demo dashboard")
+
 
 
 # Helper to draw a small status badge
