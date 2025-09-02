@@ -1,5 +1,5 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -161,6 +161,9 @@ st.divider()
 
 
 # ---------- Initialize Session State ----------
+weight_data = []
+now = datetime.now()
+
 if "weight_data" not in st.session_state:
 	st.session_state.weight_data = []
 	now = datetime.now()
