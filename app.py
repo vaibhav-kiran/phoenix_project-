@@ -85,6 +85,45 @@ with alert_col2:
 
 st.divider()
 
+# ---------- Baby Weight Overview ----------
+st.markdown("### ⚖️ Baby Weight Overview")
+
+weight_overview_col1, weight_overview_col2, weight_overview_col3 = st.columns([1, 1, 2])
+
+with weight_overview_col1:
+	st.metric(
+		label="Current Weight", 
+		value=f"{current_weight} kg",
+		delta="+0.05 kg" if current_weight > 3.15 else "-0.02 kg"
+	)
+
+with weight_overview_col2:
+	# Calculate weight trend
+	weight_trend = "↗️ Gaining" if current_weight > 3.15 else "↘️ Stable"
+	st.metric(
+		label="Weight Trend", 
+		value=weight_trend
+	)
+
+with weight_overview_col3:
+	# Weight chart for the last 7 days
+	weight_chart_data = pd.DataFrame(weight_data[:28])  # Last 28 entries (7 days)
+	weight_chart_data['Weight (kg)'] = weight_chart_data['Weight (kg)'].astype(float)
+	
+	weight_chart = (
+		alt.Chart(weight_chart_data)
+		.mark_line(point=True, color='#FF6B6B')
+		.encode(
+			x=alt.X('Date:N', title='Date'),
+			y=alt.Y('Weight (kg):Q', title='Weight (kg)'),
+			tooltip=['Date', 'Time', 'Weight (kg)']
+		)
+		.properties(height=150, title='Weight Trend (Last 7 Days)')
+	)
+	st.altair_chart(weight_chart, use_container_width=True)
+
+st.divider()
+
 
 # ---------- Interactive Baby Avatar ----------
 st.markdown("### 🎨 Interactive Baby Avatar")
