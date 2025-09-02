@@ -112,7 +112,7 @@ st.markdown("### 🔥 Thermal Heat Map")
 zone_data = pd.DataFrame(
 	{
 		"Zone": ["A", "B", "C"],
-		"Temperature": [28.2, 29.1, 27.9],
+		"Temperature": [37.2, 29.1, 27.9],
 	}
 )
 
@@ -134,7 +134,7 @@ heat_chart = (
 )
 
 st.altair_chart(heat_chart, use_container_width=True)
-st.caption("Heat map shows mostly purple (stable & safe).")
+st.caption("Heat map shows mostly white (stable & safe).")
 
 st.divider()
 
