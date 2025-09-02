@@ -143,7 +143,7 @@ with weight_track_col1:
 	)
 
 with weight_track_col2:
-	st.subheader("Weight History (6-hour intervals)")
+	st.subheader("Weight History")
 	
 	# Display weight history table
 	weight_df = pd.DataFrame(weight_data)
