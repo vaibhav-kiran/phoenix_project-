@@ -125,7 +125,7 @@ heat_chart = (
 			y=alt.Y("Temperature:Q", title="Temperature (°C)"),
 			color=alt.Color(
 				"Temperature:Q",
-				scale=alt.Scale(scheme="bluered"),
+				scale=alt.Scale(scheme="redblue", reverse=True),
 				title="°C",
 			),
 			tooltip=["Zone", "Temperature"],
