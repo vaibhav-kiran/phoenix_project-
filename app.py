@@ -103,26 +103,15 @@ for i in range(28):  # 7 days * 4 entries per day
 		"Date": time_point.strftime("%m/%d"),
 		"Time": time_point.strftime("%H:%M"),
 		"Weight (kg)": f"{weight:.2f}"
-	})
+	}
+# ---------- Baby Weight Tracking Section ----------
+st.markdown("### 📊 Baby Weight Tracking")
 
-# Reverse to show most recent first
-weight_data.reverse()
+# Create two columns for the weight tracking interface
+weight_track_col1, weight_track_col2 = st.columns([1, 2])
 
-# ---------- Sidebar Controls (Global) ----------
-with st.sidebar:
-	st.title("👶 Baby Comfort Monitor")
-	st.caption("Demo dashboard with dummy data")
-	st.divider()
-	st.subheader("Settings")
-	refresh_rate = st.slider("Auto-refresh (sec)", 0, 30, 0, help="Set to >0 for auto-refresh")
-	if refresh_rate:
-		st.caption(f"Auto-refreshing every {refresh_rate}s")
-		st.experimental_rerun
-	
-	st.divider()
-	
-	# ---------- Baby Weight Tracking ----------
-	st.subheader("📊 Baby Weight Tracking")
+with weight_track_col1:
+	st.subheader("Weight Input")
 	
 	# Current weight display
 	current_weight = st.number_input(
@@ -134,30 +123,41 @@ with st.sidebar:
 		help="Enter the baby's current weight"
 	)
 	
-	# Weight history table (every 6 hours)
-	st.write("**Weight History (6-hour intervals):**")
+	# Add new weight entry button
+	if st.button("📝 Add New Weight Entry", use_container_width=True):
+		st.success(f"Weight {current_weight} kg recorded at {datetime.now().strftime('%H:%M')}")
 	
-	# Display weight history in sidebar
+	st.divider()
+	
+	# Weight summary metrics
+	st.metric(
+		label="Latest Weight", 
+		value=f"{current_weight} kg",
+		delta="+0.05 kg" if current_weight > default_weight else "-0.02 kg"
+	)
+	
+	weight_trend = "↗️ Gaining" if current_weight > default_weight else "↘️ Stable"
+	st.metric(
+		label="Weight Trend", 
+		value=weight_trend
+	)
+
+with weight_track_col2:
+	st.subheader("Weight History (6-hour intervals)")
+	
+	# Display weight history table
 	weight_df = pd.DataFrame(weight_data)
 	st.dataframe(
 		weight_df, 
 		use_container_width=True, 
 		hide_index=True,
-		height=300
+		height=400
 	)
 	
-	# Add new weight entry button
-	if st.button("📝 Add New Weight Entry", use_container_width=True):
-		st.success(f"Weight {current_weight} kg recorded at {datetime.now().strftime('%H:%M')}")
+	st.caption("Weight records are automatically generated every 6 hours for the last 7 days")
 
+st.divider()
 
-# Helper to draw a small status badge
-def status_badge(label: str, emoji: str, color: str) -> None:
-	st.markdown(
-		f"<span style='display:inline-block;padding:4px 8px;border-radius:8px;background:{color};color:#111;font-weight:600'>"
-		f"{emoji} {label}</span>",
-		unsafe_allow_html=True,
-	)
 
 st.divider()
 
