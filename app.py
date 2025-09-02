@@ -136,7 +136,7 @@ with weight_track_col1:
 		delta="+0.05 kg" if current_weight > default_weight else "-0.02 kg"
 	)
 	
-	weight_trend = "↗️ Gaining" if current_weight > default_weight else "↘️ Stable"
+	weight_trend = "↗️ Gaining" if current_weight > default_weight else "↘️ losing"
 	st.metric(
 		label="Weight Trend", 
 		value=weight_trend
