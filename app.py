@@ -107,7 +107,7 @@ st.divider()
 
 
 # ---------- Thermal Heat Map (Dummy Visualization) ----------
-st.markdown("### 🔥 Thermal Heat Map (Dummy Visualization)")
+st.markdown("### 🔥 Thermal Heat Map")
 
 zone_data = pd.DataFrame(
 	{
@@ -125,7 +125,7 @@ heat_chart = (
 			y=alt.Y("Temperature:Q", title="Temperature (°C)"),
 			color=alt.Color(
 				"Temperature:Q",
-				scale=alt.Scale(scheme="greenblue"),
+				scale=alt.Scale(scheme="redblue"),
 				title="°C",
 			),
 			tooltip=["Zone", "Temperature"],
@@ -134,7 +134,7 @@ heat_chart = (
 )
 
 st.altair_chart(heat_chart, use_container_width=True)
-st.caption("Heat map shows mostly green (stable & safe).")
+st.caption("Heat map shows mostly purple (stable & safe).")
 
 st.divider()
 
@@ -152,6 +152,23 @@ timeline_df = pd.DataFrame(
 	]
 )
 st.dataframe(timeline_df, use_container_width=True, hide_index=True)
+
+st.divider()
+
+
+
+
+# ---------- Predictive Comfort Score (AI Dummy) ----------
+st.markdown("### 🤖 Predictive Comfort Score")
+
+score_col1, score_col2, score_col3 = st.columns([1, 1, 2])
+with score_col1:
+	st.metric("Comfort Score", "92/100")
+with score_col2:
+	status_badge("Risk Level: Low", "🟢", "#C6F6D5")
+with score_col3:
+	st.info("Prediction: “Baby likely to remain stable for the next 30 minutes.”")
+
 
 st.divider()
 
@@ -175,22 +192,5 @@ with impact_col2:
 		.properties(height=200)
 	)
 	st.altair_chart(impact_chart, use_container_width=True)
-
-st.divider()
-
-
-# ---------- Predictive Comfort Score (AI Dummy) ----------
-st.markdown("### 🤖 Predictive Comfort Score (AI Dummy)")
-
-score_col1, score_col2, score_col3 = st.columns([1, 1, 2])
-with score_col1:
-	st.metric("Comfort Score", "92/100")
-with score_col2:
-	status_badge("Risk Level: Low", "🟢", "#C6F6D5")
-with score_col3:
-	st.info("Prediction: “Baby likely to remain stable for the next 30 minutes.”")
-
-
-st.caption("Demo only. All figures are illustrative.")
 
 
